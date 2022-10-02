@@ -1,7 +1,10 @@
 {
   "dependencies": {
+    "@joi/date": "^2.1.0",
+    "dayjs": "^1.11.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.1",
+    "joi": "^17.6.2",
     "pg": "^8.8.0"
   },
   "name": "projeto15-boardcamp",
