@@ -14,9 +14,9 @@ function returnRentals(obj) {
             id: rental.rentalId,
             curtomerId: rental.categoryId,
             gameId: rental.gameId,
-            rentDate: rental.rentDate,
-            daysRented: dayjs(rental.daysRented).format('YYYY-MM-DD'),
-            returnDate: rental.returnDate,
+            rentDate: dayjs(rental.rentDate).format('YYYY-MM-DD'),
+            daysRented: rental.daysRented,
+            returnDate: rental.returnDate ? dayjs(rental.returnDate).format('YYYY-MM-DD') : rental.returnDate,
             originalPrice: rental.originalPrice,
             delayFee: rental.delayFee,
             customers: {
@@ -99,7 +99,7 @@ const endRental = async (req, res) => {
         const rentDate = rentalExists.rows[0].rentDate
         const daysRented = rentalExists.rows[0].daysRented
         const daysUsed = dayjs(today).diff(rentDate, 'days')
-        const fee = 15 * daysRented
+        const fee = 1500 * (daysUsed - daysRented)
 
         await connection.query('UPDATE rentals SET "returnDate"=$1, "delayFee"=$2 WHERE id=$3', [
             today,

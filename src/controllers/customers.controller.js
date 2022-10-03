@@ -1,4 +1,5 @@
 import connection from '../database/database.js';
+import dayjs from 'dayjs';
 import baseJoi from 'joi';
 import dateJoi from '@joi/date';
 
@@ -13,13 +14,21 @@ const customersSchema = joi.object({
 
 const listCustomer = async (req, res) => {
     const { cpf } = req.query
+
     try {
         if (cpf) {
             const customers = await connection.query('SELECT * FROM customers WHERE cpf LIKE $1;', [cpf + '%'])
             return res.status(200).send(customers.rows)
         }
         const customers = await connection.query('SELECT * FROM customers')
-        res.status(200).send(customers.rows)
+        res.status(200)
+            .send(
+                customers.rows.map(customer => {
+                    return {
+                        ...customer,
+                        birthday: dayjs(customer.birthday).format('YYYY-MM-DD')
+                    }
+                }))
     } catch (error) {
         console.log(error)
         res.sendStatus(500)
@@ -50,13 +59,12 @@ const insertCustomer = async (req, res) => {
         const cpfExistis = await connection.query('SELECT * FROM customers WHERE cpf=$1', [customerData.cpf])
         if (cpfExistis.rowCount) return res.sendStatus(409)
 
-
         //CONSERTAR BIRTHDAY QUE TA INDO FORA DO FORMATO YYYY-MM-DD
         await connection.query('INSERT INTO customers(name, phone, cpf, birthday) VALUES($1, $2, $3, $4);',
             [customerData.name,
             customerData.phone,
             customerData.cpf,
-            customerData.birthday])
+            dayjs(customerData.birthday).format('YYYY-MM-DD')])
         res.sendStatus(201)
     } catch (error) {
         console.log(error)

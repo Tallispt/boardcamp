@@ -24,7 +24,7 @@ const insertCategory = async (req, res) => {
     try {
 
         const nameExist = await connection.query('SELECT * FROM categories WHERE name=$1;', [name])
-        if (!nameExist.rowCount) return res.sendStatus(409)
+        if (nameExist.rowCount) return res.sendStatus(409)
 
         await connection.query('INSERT INTO categories(name) VALUES ($1);',
             [name])
